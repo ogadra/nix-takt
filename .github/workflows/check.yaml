@@ -30,7 +30,7 @@ jobs:
       - name: Run deadnix
         run: nix run nixpkgs#deadnix -- flake.nix package.nix dev/flake.nix
       - name: Run statix
-        run: nix run nixpkgs#statix -- check flake.nix package.nix dev/flake.nix
+        run: nix run nixpkgs#statix -- check .
       - name: Run oxfmt
         run: nix run nixpkgs#oxfmt -- --check update.ts versions/
 
