@@ -56,9 +56,19 @@ jobs:
       - uses: ./.github/actions/setup-nix
         with:
           cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Check if versions exist
+        id: versions
+        run: |
+          if ls versions/*.json 2>/dev/null | grep -q .; then
+            echo "has_versions=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_versions=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Build package
+        if: steps.versions.outputs.has_versions == 'true'
         run: nix build -L
       - name: Check version
+        if: steps.versions.outputs.has_versions == 'true'
         run: |
           version=$(nix run . -- --version)
           echo "Detected version: $version"
