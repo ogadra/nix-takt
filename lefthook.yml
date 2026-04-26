@@ -1,0 +1,23 @@
+pre-commit:
+  parallel: false
+  commands:
+    001_gitleaks:
+      run: gitleaks protect --staged --config .gitleaks.toml
+    011_fmt_nix:
+      glob: "*.nix"
+      stage_fixed: true
+      run: nixfmt {staged_files}
+    012_deadnix:
+      glob: "*.nix"
+      stage_fixed: true
+      run: deadnix --edit {staged_files}
+    013_statix:
+      glob: "*.nix"
+      run: statix check {staged_files}
+    021_oxfmt:
+      glob: "{versions/*.json,*.jsonc,*.ts}"
+      stage_fixed: true
+      run: oxfmt {staged_files}
+    022_tsc:
+      glob: "*.ts"
+      run: npx tsc --noEmit
