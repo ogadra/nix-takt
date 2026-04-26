@@ -12,8 +12,7 @@ pre-commit:
       stage_fixed: true
       run: deadnix --edit {staged_files}
     013_statix:
-      glob: "*.nix"
-      run: statix check {staged_files}
+      run: statix check .
     021_oxfmt:
       glob: "{versions/*.json,*.jsonc,*.ts}"
       stage_fixed: true
