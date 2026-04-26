@@ -19,4 +19,4 @@ pre-commit:
       run: oxfmt {staged_files}
     022_tsc:
       glob: "*.ts"
-      run: npx tsc --noEmit
+      run: tsc --noEmit

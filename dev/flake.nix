@@ -26,6 +26,7 @@
           default = pkgs.mkShellNoCC {
             packages = with pkgs; [
               nodejs_24
+              typescript
               gitleaks
               lefthook
               nixfmt-rfc-style
