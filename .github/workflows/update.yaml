@@ -39,8 +39,14 @@ jobs:
           fi
       - name: Create PR
         if: steps.changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.update.outputs.version }}
         run: |
-          VERSION="${{ steps.update.outputs.version }}"
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
+            echo "Error: VERSION '${VERSION}' is not a valid semver string" >&2
+            exit 1
+          fi
           BRANCH="update/takt-${VERSION}"
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git config user.name 'github-actions[bot]'
@@ -54,5 +60,3 @@ jobs:
             --base main \
             --head "$BRANCH"
           gh pr merge "$BRANCH" --auto --squash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
