@@ -18,8 +18,11 @@ const run = (cmd: string, args: string[]): string => {
 
 const fetchLatestVersion = async (): Promise<string> => {
   const res = await fetch('https://registry.npmjs.org/takt/latest');
-  const json = (await res.json()) as { version: string };
-  return json.version;
+  if (!res.ok) throw new Error(`npm registry returned ${res.status}`);
+  const json = (await res.json()) as Record<string, unknown>;
+  if (typeof json['version'] !== 'string')
+    throw new Error('Unexpected registry response: missing version');
+  return json['version'];
 };
 
 const getExistingVersions = (): Set<string> => {
@@ -54,12 +57,24 @@ const writeVersionFile = (data: VersionFile): void => {
   writeFileSync(path, JSON.stringify(data, null, 2) + '\n');
 };
 
+// Parses a semver string into [major, minor, patch, prerelease] for comparison.
+// prerelease is null for stable releases (sorts higher than any pre-release).
+const parseSemver = (v: string): [number, number, number, string | null] => {
+  const m = v.match(/^(\d+)\.(\d+)\.(\d+)(?:-(.+))?$/);
+  if (!m) throw new Error(`Cannot parse version: ${v}`);
+  return [Number(m[1]), Number(m[2]), Number(m[3]), m[4] ?? null];
+};
+
 const compareVersions = (a: string, b: string): number => {
-  const pa = a.split('.').map(Number);
-  const pb = b.split('.').map(Number);
-  for (let i = 0; i < 3; i++) {
-    if ((pa[i] ?? 0) !== (pb[i] ?? 0)) return (pa[i] ?? 0) - (pb[i] ?? 0);
-  }
+  const [aMaj, aMin, aPat, aPre] = parseSemver(a);
+  const [bMaj, bMin, bPat, bPre] = parseSemver(b);
+  if (aMaj !== bMaj) return aMaj - bMaj;
+  if (aMin !== bMin) return aMin - bMin;
+  if (aPat !== bPat) return aPat - bPat;
+  // null (stable) > any pre-release string
+  if (aPre === null && bPre !== null) return 1;
+  if (aPre !== null && bPre === null) return -1;
+  if (aPre !== null && bPre !== null) return aPre < bPre ? -1 : aPre > bPre ? 1 : 0;
   return 0;
 };
 

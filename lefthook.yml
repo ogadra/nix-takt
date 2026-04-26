@@ -14,7 +14,7 @@ pre-commit:
     013_statix:
       run: statix check .
     021_oxfmt:
-      glob: "{versions/*.json,*.jsonc,*.ts}"
+      glob: "{*.json,*.jsonc,*.ts}"
       stage_fixed: true
       run: oxfmt {staged_files}
     022_tsc:
