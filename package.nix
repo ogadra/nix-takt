@@ -23,10 +23,10 @@ pkgs.buildNpmPackage {
     npm run build
   '';
 
-  meta = with lib; {
+  meta = {
     description = "AI agent orchestration tool";
     homepage = "https://github.com/nrslib/takt";
-    license = licenses.mit;
+    license = lib.licenses.mit;
     mainProgram = "takt";
   };
 }

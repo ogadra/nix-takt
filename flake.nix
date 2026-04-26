@@ -31,7 +31,7 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           mkTakt = sourcesFile: pkgs.callPackage ./package.nix { inherit sourcesFile; };
-          latestSourcesFile = ./versions/${latestVersion + ".json"};
+          latestSourcesFile = ./versions/${latestVersion}.json;
         in
         {
           takt = mkTakt latestSourcesFile;
