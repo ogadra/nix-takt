@@ -15,5 +15,5 @@ runs:
     - name: Setup Cachix
       uses: cachix/cachix-action@1eb2ef646ac0255473d23a5907ad7b04ce94065c # v17
       with:
-        name: ogadra
+        name: ogadra-nix-takt
         authToken: ${{ inputs.cachix-auth-token }}
