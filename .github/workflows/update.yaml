@@ -94,4 +94,3 @@ jobs:
             --body "Automated update of takt to version ${VERSION}." \
             --base main \
             --head "$BRANCH"
-          gh workflow run check.yaml --ref "$BRANCH"
