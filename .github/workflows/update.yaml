@@ -22,7 +22,9 @@ jobs:
             nixpkgs#deadnix \
             nixpkgs#statix \
             nixpkgs#oxfmt \
-            nixpkgs#nodejs_24
+            nixpkgs#nodejs_24 \
+            nixpkgs#nix-prefetch-github \
+            nixpkgs#prefetch-npm-deps
       - name: Install lefthook hooks
         run: lefthook install
       - id: update
