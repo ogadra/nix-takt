@@ -18,23 +18,27 @@ jobs:
         run: |
           nix profile install \
             nixpkgs#deadnix \
+            nixpkgs#gitleaks \
+            nixpkgs#jq \
             nixpkgs#lefthook \
             nixpkgs#nixfmt-rfc-style \
             nixpkgs#oxfmt \
             nixpkgs#statix \
             nixpkgs#nodejs_24 \
+            nixpkgs#nix-prefetch-git \
             nixpkgs#nix-prefetch-github \
             nixpkgs#prefetch-npm-deps
       - name: Install lefthook hooks
         run: lefthook install
       - id: update
         run: |
-          VERSION=$(npx tsx update.ts | tail -1)
+          OUTPUT=$(npx tsx update.ts)
+          VERSION=$(echo "$OUTPUT" | tail -1)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
       - name: Check for changes
         id: changes
         run: |
-          if git diff --quiet; then
+          if [ -z "$(git status --porcelain)" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
@@ -44,21 +48,50 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.update.outputs.version }}
+          REPO: ${{ github.repository }}
         run: |
           if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
             echo "Error: VERSION '${VERSION}' is not a valid semver string" >&2
             exit 1
           fi
           BRANCH="update/takt-${VERSION}"
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git config user.name 'github-actions[bot]'
-          git switch -c "$BRANCH"
-          git add -A
-          git commit -m "chore: update takt to ${VERSION}"
-          git push -u origin "$BRANCH"
+          BASE_SHA=$(git rev-parse HEAD)
+
+          # Create blobs and build tree entries for each changed file
+          TREE_ENTRIES="[]"
+          while IFS= read -r file; do
+            BLOB_SHA=$(gh api repos/"$REPO"/git/blobs \
+              -f "content=$(base64 -w0 < "$file")" \
+              -f "encoding=base64" \
+              --jq '.sha')
+            TREE_ENTRIES=$(echo "$TREE_ENTRIES" | jq \
+              --arg path "$file" \
+              --arg sha "$BLOB_SHA" \
+              '. += [{"path": $path, "mode": "100644", "type": "blob", "sha": $sha}]')
+          done < <(git status --porcelain | awk '{print $2}')
+
+          # Create tree
+          TREE_SHA=$(jq -n \
+            --arg base "$BASE_SHA" \
+            --argjson tree "$TREE_ENTRIES" \
+            '{"base_tree": $base, "tree": $tree}' \
+            | gh api repos/"$REPO"/git/trees --input - --jq '.sha')
+
+          # Create signed commit via API
+          COMMIT_SHA=$(gh api repos/"$REPO"/git/commits \
+            -f "message=chore: update takt to ${VERSION}" \
+            -f "tree=$TREE_SHA" \
+            -f "parents[]=$BASE_SHA" \
+            --jq '.sha')
+
+          # Create branch pointing to new commit
+          gh api repos/"$REPO"/git/refs \
+            -f "ref=refs/heads/${BRANCH}" \
+            -f "sha=$COMMIT_SHA"
+
           gh pr create \
             --title "chore: update takt to ${VERSION}" \
             --body "Automated update of takt to version ${VERSION}." \
             --base main \
             --head "$BRANCH"
-          gh pr merge "$BRANCH" --auto --squash
+          gh workflow run check.yaml --ref "$BRANCH"
