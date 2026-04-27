@@ -48,6 +48,7 @@ const fetchNpmDepsHash = (rev: string, srcHash: string): string => {
     'build',
     '--no-link',
     '--print-out-paths',
+    '--impure',
     '--expr',
     `(builtins.getFlake "nixpkgs").legacyPackages.\${builtins.currentSystem}.fetchFromGitHub { owner = "nrslib"; repo = "takt"; rev = "${rev}"; hash = "${srcHash}"; }`,
   ]);
