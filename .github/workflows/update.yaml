@@ -84,10 +84,9 @@ jobs:
             -f "parents[]=$BASE_SHA" \
             --jq '.sha')
 
-          # Create branch pointing to new commit
-          gh api repos/"$REPO"/git/refs \
-            -f "ref=refs/heads/${BRANCH}" \
-            -f "sha=$COMMIT_SHA"
+          # Push the verified commit as a new branch (triggers push event)
+          git fetch origin "$COMMIT_SHA"
+          git push origin "${COMMIT_SHA}:refs/heads/${BRANCH}"
 
           gh pr create \
             --title "chore: update takt to ${VERSION}" \
