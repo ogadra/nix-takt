@@ -33,7 +33,6 @@ jobs:
       - id: update
         run: |
           OUTPUT=$(npx tsx update.ts)
-          echo "$OUTPUT"
           VERSION=$(echo "$OUTPUT" | tail -1)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
       - name: Check for changes
