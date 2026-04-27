@@ -99,4 +99,12 @@ jobs:
             --base main \
             --head "$BRANCH"
 
-          gh pr merge --auto --merge "$BRANCH"
+          PR_NODE_ID=$(gh api repos/"$REPO"/pulls \
+            --jq ".[] | select(.head.ref==\"$BRANCH\") | .node_id")
+
+          gh api graphql -f query='
+            mutation($prId: ID!) {
+              enablePullRequestAutoMerge(input: {pullRequestId: $prId, mergeMethod: MERGE}) {
+                pullRequest { autoMergeRequest { enabledAt } }
+              }
+            }' -f prId="$PR_NODE_ID"
