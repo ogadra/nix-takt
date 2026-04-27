@@ -23,6 +23,7 @@ jobs:
             nixpkgs#oxfmt \
             nixpkgs#statix \
             nixpkgs#nodejs_24 \
+            nixpkgs#nix-prefetch-git \
             nixpkgs#nix-prefetch-github \
             nixpkgs#prefetch-npm-deps
       - name: Install lefthook hooks
