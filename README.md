@@ -23,10 +23,12 @@ takt --version
 
 ## How It Works
 
+[.github/workflows/update.yaml](https://github.com/ogadra/nix-takt/blob/main/.github/workflows/update.yaml)
+
 1. `update.ts` fetches the latest version from the npm registry
 2. `nix-prefetch-github` computes the source hash
 3. `prefetch-npm-deps` computes the npm dependencies hash
-4. GitHub Actions runs the update script hourly and commits any changes
+4. GitHub Actions runs the update script hourly and opens a PR if there are changes
 5. The flake builds takt from source using `buildNpmPackage` with Node.js 24
 
 ## Supported Platforms
@@ -36,7 +38,7 @@ takt --version
 - `x86_64-darwin`
 - `aarch64-darwin`
 
-### Test the build
+## Test the build
 
 ```bash
 nix build

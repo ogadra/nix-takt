@@ -23,10 +23,12 @@ takt --version
 
 ## 仕組み
 
+[.github/workflows/update.yaml](https://github.com/ogadra/nix-takt/blob/main/.github/workflows/update.yaml)
+
 1. `update.ts` が npm registry から最新バージョンを取得
 2. `nix-prefetch-github` でソースの hash を計算
 3. `prefetch-npm-deps` で npm 依存関係の hash を計算
-4. GitHub Actions が毎時スクリプトを実行し、変更があれば自動コミット
+4. GitHub Actions が毎時スクリプトを実行し、変更があればPR作成
 5. `buildNpmPackage` + Node.js 24 でソースからビルド
 
 ## 対応プラットフォーム
@@ -36,7 +38,7 @@ takt --version
 - `x86_64-darwin`
 - `aarch64-darwin`
 
-### ビルドのテスト
+## ビルドのテスト
 
 ```bash
 nix build
