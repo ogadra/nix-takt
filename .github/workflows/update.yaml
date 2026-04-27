@@ -17,11 +17,11 @@ jobs:
       - name: Install dev tools
         run: |
           nix profile install \
+            nixpkgs#deadnix \
             nixpkgs#lefthook \
             nixpkgs#nixfmt-rfc-style \
-            nixpkgs#deadnix \
-            nixpkgs#statix \
             nixpkgs#oxfmt \
+            nixpkgs#statix \
             nixpkgs#nodejs_24 \
             nixpkgs#nix-prefetch-github \
             nixpkgs#prefetch-npm-deps
