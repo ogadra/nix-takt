@@ -6,10 +6,13 @@ on:
 jobs:
   update-sources:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
+    permissions: {}
     steps:
+      - uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
+        id: app-token
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: ./.github/actions/setup-nix
         with:
@@ -46,7 +49,7 @@ jobs:
       - name: Create PR
         if: steps.changes.outputs.changed == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
           VERSION: ${{ steps.update.outputs.version }}
           REPO: ${{ github.repository }}
         run: |
@@ -84,13 +87,14 @@ jobs:
             -f "parents[]=$BASE_SHA" \
             --jq '.sha')
 
-          # Create branch pointing to new commit
-          gh api repos/"$REPO"/git/refs \
-            -f "ref=refs/heads/${BRANCH}" \
-            -f "sha=$COMMIT_SHA"
+          # Push via App token to trigger push event
+          git fetch "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "$COMMIT_SHA"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "${COMMIT_SHA}:refs/heads/${BRANCH}"
 
           gh pr create \
             --title "chore: update takt to ${VERSION}" \
             --body "Automated update of takt to version ${VERSION}." \
             --base main \
             --head "$BRANCH"
+
+          gh pr merge --auto --squash "$BRANCH"
