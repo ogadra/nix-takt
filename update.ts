@@ -44,10 +44,12 @@ const fetchSrcHash = (version: string): { rev: string; hash: string } => {
 };
 
 const fetchNpmDepsHash = (rev: string, srcHash: string): string => {
-  const srcPath = run('nix-build', [
-    '--no-out-link',
-    '-E',
-    `let pkgs = import <nixpkgs> {}; in pkgs.fetchFromGitHub { owner = "nrslib"; repo = "takt"; rev = "${rev}"; hash = "${srcHash}"; }`,
+  const srcPath = run('nix', [
+    'build',
+    '--no-link',
+    '--print-out-paths',
+    '--expr',
+    `(builtins.getFlake "nixpkgs").legacyPackages.\${builtins.currentSystem}.fetchFromGitHub { owner = "nrslib"; repo = "takt"; rev = "${rev}"; hash = "${srcHash}"; }`,
   ]);
   return run('prefetch-npm-deps', [`${srcPath}/package-lock.json`]);
 };
