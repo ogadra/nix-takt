@@ -99,4 +99,4 @@ jobs:
             --base main \
             --head "$BRANCH"
 
-          gh pr merge --auto --squash "$BRANCH"
+          gh pr merge --auto --merge "$BRANCH"
