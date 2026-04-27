@@ -18,6 +18,7 @@ jobs:
         run: |
           nix profile install \
             nixpkgs#deadnix \
+            nixpkgs#gitleaks \
             nixpkgs#lefthook \
             nixpkgs#nixfmt-rfc-style \
             nixpkgs#oxfmt \
