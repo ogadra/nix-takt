@@ -14,6 +14,8 @@ jobs:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          token: ${{ steps.app-token.outputs.token }}
       - uses: ./.github/actions/setup-nix
         with:
           cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
@@ -87,9 +89,9 @@ jobs:
             -f "parents[]=$BASE_SHA" \
             --jq '.sha')
 
-          # Push via App token to trigger push event
-          git fetch "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "$COMMIT_SHA"
-          git push "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "${COMMIT_SHA}:refs/heads/${BRANCH}"
+          # Push via App token to trigger pull_request event
+          git fetch origin "$COMMIT_SHA"
+          git push origin "${COMMIT_SHA}:refs/heads/${BRANCH}"
 
           gh pr create \
             --title "chore: update takt to ${VERSION}" \
