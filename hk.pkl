@@ -1,0 +1,33 @@
+amends "package://github.com/jdx/hk/releases/download/v1.44.2/hk@1.44.2#/Config.pkl"
+
+hooks {
+  ["pre-commit"] {
+    fix = true
+    stash = "git"
+    steps {
+      ["gitleaks"] {
+        exclusive = true
+        check = "gitleaks protect --staged --config .gitleaks.toml"
+      }
+      ["nixfmt"] {
+        glob = List("*.nix")
+        fix = "nixfmt {{files}}"
+      }
+      ["deadnix"] {
+        glob = List("*.nix")
+        fix = "deadnix --edit {{files}}"
+      }
+      ["statix"] {
+        check = "statix check ."
+      }
+      ["oxfmt"] {
+        glob = List("*.json", "*.jsonc", "*.ts")
+        fix = "oxfmt --write {{files}}"
+      }
+      ["tsc"] {
+        glob = List("*.ts")
+        check = "tsc --noEmit"
+      }
+    }
+  }
+}

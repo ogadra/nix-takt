@@ -3,10 +3,11 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    hk.url = "github:jdx/hk";
   };
 
   outputs =
-    { nixpkgs, ... }:
+    { nixpkgs, hk, ... }:
     let
       systems = [
         "x86_64-linux"
@@ -28,14 +29,15 @@
               nodejs_24
               typescript
               gitleaks
-              lefthook
+              hk.packages.${system}.default
+              pkl
               nixfmt-rfc-style
               deadnix
               statix
               oxfmt
             ];
             shellHook = ''
-              lefthook install
+              hk install
             '';
           };
         }
