@@ -16,9 +16,11 @@ hooks {
       ["deadnix"] {
         glob = List("*.nix")
         fix = "deadnix --edit {{files}}"
+        depends = List("nixfmt")
       }
       ["statix"] {
         check = "statix check ."
+        depends = List("deadnix")
       }
       ["oxfmt"] {
         glob = List("*.json", "*.jsonc", "*.ts")
