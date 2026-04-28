@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    hk.url = "github:jdx/hk";
+    hk.url = "github:jdx/hk/3cb88fb883b29281fff68c4edfc57a5fb97758fd"; # v1.44.2
   };
 
   outputs =

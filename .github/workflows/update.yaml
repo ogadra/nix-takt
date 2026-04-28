@@ -34,7 +34,7 @@ jobs:
             nixpkgs#nix-prefetch-github \
             nixpkgs#prefetch-npm-deps
       - name: Install hk hooks
-        run: nix run github:jdx/hk -- install
+        run: nix run github:jdx/hk/3cb88fb883b29281fff68c4edfc57a5fb97758fd -- install # v1.44.2
       - id: update
         run: |
           OUTPUT=$(npx tsx update.ts)
