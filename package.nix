@@ -20,11 +20,19 @@ pkgs.buildNpmPackage {
   inherit (sources) npmDepsHash;
 
   env = {
-    PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
-    PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
     PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS = "true";
     ONNXRUNTIME_NODE_INSTALL = "skip";
   };
+
+  postPatch = ''
+    export PLAYWRIGHT_BROWSERS_PATH="$TMPDIR/playwright-browsers"
+    mkdir -p "$PLAYWRIGHT_BROWSERS_PATH"
+    cp -rL ${pkgs.playwright-driver.browsers}/. "$PLAYWRIGHT_BROWSERS_PATH/"
+    chmod -R u+w "$PLAYWRIGHT_BROWSERS_PATH"
+    for d in "$PLAYWRIGHT_BROWSERS_PATH"/*/; do
+      touch "$d/INSTALLATION_COMPLETE"
+    done
+  '';
 
   buildPhase = ''
     npm run build
