@@ -19,6 +19,13 @@ pkgs.buildNpmPackage {
   nodejs = pkgs.nodejs_24;
   inherit (sources) npmDepsHash;
 
+  env = {
+    PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
+    PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
+    PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS = "true";
+    ONNXRUNTIME_NODE_INSTALL = "skip";
+  };
+
   buildPhase = ''
     npm run build
   '';
