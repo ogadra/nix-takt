@@ -19,6 +19,8 @@ pkgs.buildNpmPackage {
   nodejs = pkgs.nodejs_24;
   inherit (sources) npmDepsHash;
 
+  makeCacheWritable = true;
+
   env = {
     PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS = "true";
     ONNXRUNTIME_NODE_INSTALL = "skip";
