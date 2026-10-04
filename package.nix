@@ -20,6 +20,7 @@ pkgs.buildNpmPackage {
   inherit (sources) npmDepsHash;
 
   makeCacheWritable = true;
+  dontNpmPrune = true;
 
   env = {
     PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS = "true";
