@@ -19,6 +19,9 @@ pkgs.buildNpmPackage {
   nodejs = pkgs.nodejs_24;
   inherit (sources) npmDepsHash;
 
+  # takt ships bundled deps (inBundle); npm needs packuments cached to reify them.
+  npmDepsFetcherVersion = 2;
+
   makeCacheWritable = true;
   dontNpmPrune = true;
 
