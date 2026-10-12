@@ -52,7 +52,11 @@ const fetchNpmDepsHash = (rev: string, srcHash: string): string => {
     '--expr',
     `(builtins.getFlake "nixpkgs").legacyPackages.\${builtins.currentSystem}.fetchFromGitHub { owner = "nrslib"; repo = "takt"; rev = "${rev}"; hash = "${srcHash}"; }`,
   ]);
-  return run('prefetch-npm-deps', [`${srcPath}/package-lock.json`]);
+  // NPM_FETCHER_VERSION must match npmDepsFetcherVersion in package.nix.
+  return execFileSync('prefetch-npm-deps', [`${srcPath}/package-lock.json`], {
+    encoding: 'utf8',
+    env: { ...process.env, NPM_FETCHER_VERSION: '2' },
+  }).trim();
 };
 
 const writeVersionFile = (data: VersionFile): void => {
