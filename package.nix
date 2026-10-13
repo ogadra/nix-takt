@@ -27,6 +27,9 @@ pkgs.buildNpmPackage {
 
   env = {
     PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS = "true";
+    # @playwright/browser-chromium's install.js tries to download browsers,
+    # which cannot work in the sandbox; browsers are provided via postPatch.
+    PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
     ONNXRUNTIME_NODE_INSTALL = "skip";
   };
 
